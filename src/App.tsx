@@ -32,24 +32,32 @@ function App() {
 
   useEffect(() => {
     checkWinner();
-    // checkDraw();
-  }, board);
+    checkDraw();
+  }, [board]);
 
   const checkWinner = () => {
-    winsPossibilities.forEach((cells) => {
+    return winsPossibilities.some((cells) => {
       if (cells.every((cell) => cell === 1)) {
         setGameOver(true);
         setWinner(1);
-      }
 
+        return true;
+      }
       if (cells.every((cell) => cell === 2)) {
         setGameOver(true);
         setWinner(2);
-      }
-    });
 
-    if (board.every((item) => item !== 0)) {
-      console.log("funfa ae");
+        return true;
+      }
+
+      return false;
+    });
+  };
+
+  const checkDraw = () => {
+    if (board.every((item) => item !== 0) && !checkWinner()) {
+      setGameOver(true);
+      setWinner(3);
     }
   };
 
@@ -60,10 +68,9 @@ function App() {
     setWinner(null);
   };
 
-  return (
-    <div className={styles.container}>
-      <h1 className={styles.container__title}>Jogo da velha</h1>
-      <p className={styles.container__turn}>
+  const renderWinner = () => {
+    return (
+      <>
         {winner ? (
           <>
             {winner === 1 && "Jogador O venceu"}
@@ -73,8 +80,13 @@ function App() {
         ) : (
           <>Vez do jogador: {player === 1 ? "O" : "X"}</>
         )}
-      </p>
-      <div className={styles.container__grid}>
+      </>
+    );
+  };
+
+  const renderBoard = () => {
+    return (
+      <>
         {board.map((item, itemIndex) => (
           <div
             key={itemIndex}
@@ -88,7 +100,15 @@ function App() {
             {item === 2 && "X"}
           </div>
         ))}
-      </div>
+      </>
+    );
+  };
+
+  return (
+    <div className={styles.container}>
+      <h1 className={styles.container__title}>Jogo da velha</h1>
+      <p className={styles.container__turn}>{renderWinner()}</p>
+      <div className={styles.container__grid}>{renderBoard()}</div>
       {gameOver && (
         <button className={styles.container__button} onClick={handlePlayAgain}>
           Jogar novamente
